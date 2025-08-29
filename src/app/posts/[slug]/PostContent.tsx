@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { format } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -81,7 +82,7 @@ export default function PostContent({ post, config }: PostContentProps) {
         // If not enough related posts, fill with recent posts
         if (related.length < 4) {
           const recentPosts = data.posts
-            .filter((p: Post) => p.id !== post.id && !related.find(r => r.id === p.id))
+            .filter((p: Post) => p.id !== post.id && !related.find((r: Post) => r.id === p.id))
             .slice(0, 4 - related.length);
           related.push(...recentPosts);
         }
@@ -148,7 +149,7 @@ export default function PostContent({ post, config }: PostContentProps) {
           <div className="flex items-center justify-between">
             {/* Logo and Title */}
             <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <img src={config?.site.logo || '/icon.png'} alt="Logo" className="w-8 h-8" />
+              <Image src={config?.site.logo || '/icon.png'} alt="Logo" width={32} height={32} className="w-8 h-8" />
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {config?.site.name || '博客'}
               </h1>
@@ -403,7 +404,7 @@ export default function PostContent({ post, config }: PostContentProps) {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Link href="/" className="hover:opacity-80 transition-opacity">
-                <img src={config?.site.logo || '/icon.png'} alt="Logo" className="w-6 h-6" />
+                <Image src={config?.site.logo || '/icon.png'} alt="Logo" width={24} height={24} className="w-6 h-6" />
               </Link>
               <p className="text-gray-600 dark:text-gray-400 text-sm">
                 &copy; 2025{' '}

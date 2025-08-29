@@ -14,12 +14,20 @@ interface Post {
   title: string;
   excerpt: string;
   content: string;
-  screenshot: string;
-  url: string;
+  screenshot?: string;
+  url?: string;
   keywords: string[];
-  quality: string;
+  quality?: string;
   readTime: number;
   createdTime: string;
+  status: number;
+  isAd: boolean;
+  description?: string;
+  summary?: string;
+  oneSentence?: string;
+  unconventional?: string;
+  xiaohongshu?: string;
+  articleScan?: string;
 }
 
 interface SiteConfig {

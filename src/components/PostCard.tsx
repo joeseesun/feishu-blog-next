@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
+import Image from 'next/image';
 import { Post } from '@/types/post';
 import HighlightedText from './HighlightedText';
 
@@ -32,27 +32,15 @@ export default function PostCard({ post, searchQuery = '' }: PostCardProps) {
     <Link href={`/posts/${post.slug}`} className="group">
       <article className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-200 dark:border-gray-700 group-hover:border-gray-900 dark:group-hover:border-gray-100 group-hover:-translate-y-1 h-full flex flex-col">
         {post.screenshot && (
-          <div className="aspect-video overflow-hidden bg-gray-200 dark:bg-gray-700">
-            <img
+          <div className="relative aspect-video overflow-hidden bg-gray-200 dark:bg-gray-700">
+            <Image
               src={post.screenshot}
               alt={post.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              loading="lazy"
-              onError={(e) => {
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              onError={() => {
                 console.error('Image failed to load:', post.screenshot);
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const parent = target.parentElement;
-                if (parent) {
-                  parent.innerHTML = `
-                    <div class="flex items-center justify-center h-full text-gray-500">
-                      <div class="text-center">
-                        <div class="text-4xl mb-2">🖼️</div>
-                        <p class="text-sm">图片加载失败</p>
-                      </div>
-                    </div>
-                  `;
-                }
               }}
               onLoad={() => console.log('Image loaded:', post.screenshot)}
             />

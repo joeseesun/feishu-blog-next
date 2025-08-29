@@ -1,14 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface SafeImageProps {
   src: string;
   alt: string;
   className?: string;
+  fill?: boolean;
+  sizes?: string;
 }
 
-export default function SafeImage({ src, alt, className }: SafeImageProps) {
+export default function SafeImage({ src, alt, className, fill = false, sizes }: SafeImageProps) {
   const [imageError, setImageError] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -45,13 +48,14 @@ export default function SafeImage({ src, alt, className }: SafeImageProps) {
           </div>
         </div>
       )}
-      <img
+      <Image
         src={src}
         alt={alt}
-        className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300`}
+        fill={fill}
+        sizes={sizes || "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"}
+        className={`object-cover group-hover:scale-105 transition-transform duration-300 ${fill ? '' : 'w-full h-full'}`}
         onError={handleImageError}
         onLoad={handleImageLoad}
-        loading="lazy"
       />
     </div>
   );

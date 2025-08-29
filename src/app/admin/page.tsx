@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Heart, MessageCircle, Github, ArrowLeft, Save, Eye, EyeOff } from 'lucide-react';
 import Modal from '@/components/Modal';
 
@@ -184,7 +185,7 @@ export default function AdminPage() {
           <div className="max-w-6xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <img src={config.site?.logo || '/icon.png'} alt="Logo" className="w-8 h-8" />
+                <Image src={config.site?.logo || '/icon.png'} alt="Logo" width={32} height={32} className="w-8 h-8" />
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {config.site?.name || '乔木飞书收藏'}
                 </h1>
@@ -304,7 +305,7 @@ export default function AdminPage() {
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <img src="/icon.png" alt="Logo" className="w-8 h-8" />
+              <Image src="/icon.png" alt="Logo" width={32} height={32} className="w-8 h-8" />
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 管理后台
               </h1>
