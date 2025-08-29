@@ -1,0 +1,38 @@
+{
+  "feishu": {
+    "appId": "",
+    "appSecret": "",
+    "appToken": "",
+    "tableId": ""
+  },
+  "site": {
+    "name": "乔木飞书收藏",
+    "description": "基于飞书多维表格的动态博客系统",
+    "author": "向阳乔木",
+    "logo": "/icon.png",
+    "favicon": "/favicon.ico",
+    "domain": ""
+  },
+  "social": {
+    "twitter": "https://x.com/vista8",
+    "github": "https://github.com/joeseesun/",
+    "email": "",
+    "weibo": ""
+  },
+  "qrCodes": {
+    "donation": "https://newimg.t5t6.com/1751870053373-97dc7339-5191-4dde-b891-bf4fb4fe8118.png",
+    "wechat": "https://newimg.t5t6.com/1751870053371-c2bf9308-2e52-4a15-81b4-6c7490b551cf.jpg"
+  },
+  "features": {
+    "postsPerPage": 20,
+    "showDonation": true,
+    "showWechat": true,
+    "showSearch": true,
+    "showRelatedPosts": true
+  },
+  "seo": {
+    "title": "乔木飞书收藏",
+    "description": "基于飞书多维表格的动态博客系统",
+    "keywords": "博客,飞书,多维表格,内容管理"
+  }
+}

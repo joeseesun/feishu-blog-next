@@ -88,13 +88,19 @@ class FeishuAPI {
         // 基本字段检查
         if (!item.fields?.Title || !item.fields?.Content) return false;
         
-        // 状态过滤：只显示已发布的内容（状态为1）
-        const status = item.fields['状态'] || 1;
-        if (status !== 1) return false;
+        // 状态过滤：只显示已发布的内容
+        // 状态字段可能是字符串"1"或数字1，或者为空时默认为发布状态
+        const status = item.fields['状态'];
+        if (status !== undefined && status !== '1' && status !== 1) {
+          return false;
+        }
         
-        // 广告过滤：不显示广告内容
+        // 广告过滤：只过滤明确标记为纯广告的内容
+        // 允许有轻微推广内容的优质文章通过
         const isAd = item.fields['是广告吗'] || '';
-        if (isAd === '是' || isAd === 'yes') return false;
+        if (isAd === '纯广告' || isAd === '垃圾广告' || isAd.includes('纯广告')) {
+          return false;
+        }
         
         return true;
       })
@@ -117,15 +123,42 @@ class FeishuAPI {
           }
         }
         
-        const status = item.fields['状态'] || 1; // 默认为已发布
+        // 处理状态字段：字符串"1"转为数字1，空值默认为1
+        const statusField = item.fields['状态'];
+        const status = statusField === '1' ? 1 : (statusField === undefined ? 1 : Number(statusField));
         const description = item.fields.Description || '';
         const summary = item.fields['摘要总结'] || '';
         const oneSentence = item.fields['一句话总结'] || '';
+        const unconventional = item.fields['反常识'] || '';
+        const xiaohongshu = item.fields['改写成小红书风格'] || '';
+        const articleScan = item.fields['文章略读'] || '';
         const keywords = item.fields['关键词'] || '';
         const readingTime = item.fields['阅读时长'] || '';
         const isAd = item.fields['是广告吗'] || '';
         const quality = item.fields['质量判断'] || '';
         const collectDate = item.fields['收藏日期'] || '';
+        
+        // 构建新的内容结构，使用AI生成的模块
+        let structuredContent = '';
+        
+        if (oneSentence) {
+          structuredContent += `## 💡 核心观点\n\n${oneSentence}\n\n`;
+        }
+        
+        if (summary) {
+          structuredContent += `## 📚 内容摘要\n\n${summary}\n\n`;
+        }
+        
+        if (unconventional) {
+          structuredContent += `## 🤔 反常识思考\n\n${unconventional}\n\n`;
+        }
+        
+        if (xiaohongshu) {
+          structuredContent += `## 🌟 小红书风格解读\n\n${xiaohongshu}\n\n`;
+        }
+        
+        // 如果没有AI生成内容，回退到原始内容
+        const finalContent = structuredContent || content;
         
         // 优先使用AI生成的摘要，然后是描述，最后从内容生成
         let excerpt = '';
@@ -161,7 +194,7 @@ class FeishuAPI {
         return {
           id: item.record_id,
           title,
-          content,
+          content: finalContent,
           excerpt,
           url,
           screenshot,
@@ -170,12 +203,15 @@ class FeishuAPI {
           readTime,
           // 新增字段
           status,
-          keywords: keywords ? keywords.split(',').map((k: string) => k.trim()) : [],
+          keywords: keywords ? keywords.split(/[,，、]/).map((k: string) => k.trim()).filter((k: string) => k.length > 0) : [],
           isAd: isAd === '是' || isAd === 'yes',
           quality,
           description,
           summary,
-          oneSentence
+          oneSentence,
+          unconventional,
+          xiaohongshu,
+          articleScan
         };
       })
       .sort((a: Post, b: Post) => new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime());
@@ -187,15 +223,54 @@ class FeishuAPI {
   }
 }
 
+async function getFeishuConfig(): Promise<FeishuConfig> {
+  try {
+    // Try to read from config file first
+    const fs = require('fs');
+    const path = require('path');
+    const configFile = path.join(process.cwd(), 'feishu-config.json');
+    
+    if (fs.existsSync(configFile)) {
+      const data = fs.readFileSync(configFile, 'utf8');
+      const config = JSON.parse(data);
+      
+      // Handle both old and new config formats
+      let feishuConfig;
+      if (config.feishu) {
+        // New nested format
+        feishuConfig = config.feishu;
+      } else if (config.appId) {
+        // Old flat format
+        feishuConfig = {
+          appId: config.appId,
+          appSecret: config.appSecret,
+          appToken: config.appToken,
+          tableId: config.tableId
+        };
+      }
+      
+      // If all required fields are present in config file, use it
+      if (feishuConfig && feishuConfig.appId && feishuConfig.appSecret && feishuConfig.appToken && feishuConfig.tableId) {
+        return feishuConfig;
+      }
+    }
+  } catch (error) {
+    console.error('Error reading config file:', error);
+  }
+  
+  // Fallback to environment variables
+  return {
+    appId: process.env.FEISHU_APP_ID || '',
+    appSecret: process.env.FEISHU_APP_SECRET || '',
+    appToken: process.env.FEISHU_APP_TOKEN || '',
+    tableId: process.env.FEISHU_TABLE_ID || ''
+  };
+}
+
 export async function GET(request: NextRequest) {
   try {
-    // Get configuration from environment variables
-    const config: FeishuConfig = {
-      appId: process.env.FEISHU_APP_ID || '',
-      appSecret: process.env.FEISHU_APP_SECRET || '',
-      appToken: process.env.FEISHU_APP_TOKEN || '',
-      tableId: process.env.FEISHU_TABLE_ID || ''
-    };
+    // Get configuration from config file or environment variables
+    const config = await getFeishuConfig();
 
     // Validate configuration
     const requiredFields = Object.entries(config);

@@ -16,4 +16,7 @@ export interface Post {
   description?: string;
   summary?: string;
   oneSentence?: string;
+  unconventional?: string;
+  xiaohongshu?: string;
+  articleScan?: string;
 }
