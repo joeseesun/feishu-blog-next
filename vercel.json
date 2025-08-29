@@ -1,0 +1,18 @@
+{
+  "functions": {
+    "src/app/api/posts/route.ts": {
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=300, stale-while-revalidate=300"
+        }
+      ]
+    }
+  ]
+}
